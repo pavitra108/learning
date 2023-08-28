@@ -10,6 +10,7 @@ print(ans)
 # Iterate the list
 # Take each number and add to set. If duplicate it wont be added.
 # check the count in the set to identify if there is duplicate
+# hello
 def checkDuplicate(nums):
     myset = set()
     for each_num in nums:
