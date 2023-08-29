@@ -10,9 +10,9 @@ def merge(nums1, m, nums2, n):
     nums1.sort()
     print(nums1)
 
-a= 1,2,4,0
-b= 3,7,0
-ans = merge([a], 4, [b], 3)
+a= [1,2,4,0]
+b= [3,7,0]
+ans = merge(a, 4, b, 3)
 
 
 
