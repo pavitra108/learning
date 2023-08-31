@@ -37,8 +37,11 @@ def count_word(para):
 
 def custom_fn(input):
     return input[1]
+def call_index(dex):
+    return dex
 ans = count_word("All Iron Man Movies. Three Iron Man movies. However, Tony Stark played a big part in the MCU and was also one of the key characters in six other movies in the franchise. Iron Man appeared in 9 movies and had one uncredited cameo.")
-sorted_dic = dict(sorted(ans.items(), key=custom_fn, reverse=True)[:3])
+given_index = call_index(4)
+sorted_dic = dict(sorted(ans.items(), key=custom_fn, reverse=True)[:given_index])
 ok = print(sorted_dic)
 
 
