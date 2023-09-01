@@ -1,3 +1,4 @@
+# Merge and sort sum
 # remove 0 from list 1
 # remove 0 from list 2
 # merge values from list 2 to list 1 - duplicates can be there
@@ -16,8 +17,8 @@ b = [3, 7, 0]
 ans = merge(a, 4, b, 3)
 
 
-# create a dictionary
-# split words in a string
+# Count word sum
+# create a dictionary, split words in a string
 # iterate each word and check if it there in dic as value
 # if word is there, plus one else just 1
 # word right before full stop - word and full stop taken as one string(not done
@@ -45,4 +46,21 @@ sorted_dic = dict(sorted(ans.items(), key=custom_fn, reverse=True)[:given_index]
 ok = print(sorted_dic)
 
 
+# is a string a palindrome sum
+# Take first letter in the word n see if it the same as the last index - length
 
+def check_palindrome(myword):
+    l= len(myword) - 1
+    for index, each_letter in enumerate(myword):
+        next_l = l - index
+        gg = myword[next_l]
+        if each_letter == gg:
+            pass
+        else:
+            return False
+
+    return True
+
+
+ans = check_palindrome("level")
+print(ans)
