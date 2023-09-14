@@ -55,3 +55,9 @@ def containsDuplicate(nums):
 
 check=containsDuplicate([5,2,3,1])
 print(check)
+
+
+
+
+def merge(self, nums1: List[int], m: int, nums2: List[int], n: int) -> None:
+    """
