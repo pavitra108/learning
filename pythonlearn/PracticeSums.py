@@ -43,3 +43,21 @@ def create_profile(given_name, *surname, **profile):
 
 
 create_profile("Sebastian", "Thrun", cofounded="Udacity", experience="Stanford Professor")
+
+# Generate Tribonacci numbers
+# Careful not to loop infinitely
+
+def generate_tribs():
+    a, b, c= 0, 0, 1
+    while True:
+        a, b, c = b, c, a + b + c
+        yield a
+
+def tribs_under(n):
+    for trib in generate_tribs():
+        if trib > n:
+            break
+        print(trib)
+
+tribs_under(200)
+
