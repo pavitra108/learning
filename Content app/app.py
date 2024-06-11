@@ -9,11 +9,11 @@ import os
 
 
 # Replace these values with your PostgreSQL connection details
-dbname = "project_db"
+dbname = "db-name"
 user = "postgres"
-password = "Reboot@123"
-host = "127.0.0.1"
-port = 5432
+password = "psw"
+host = "host"
+port = 5431
 
 # Establish a connection to the PostgreSQL database
 connection = psycopg2.connect(
