@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en" xmlns="http://www.w3.org/1999/html">
+<head>
+    <meta charset="UTF-8">
+    <title>Aadith Academy</title>
+    <style>
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            margin-bottom: 15px;
+        }
+        textarea {
+            width: 70%;
+            height: 150px; /* Adjust the height as needed */
+        }
+    </style>
+    <style>
+        .button-group {
+            display: flex;
+            justify-content: flex-start;
+
+        }
+        .button {
+            padding: 10px 10px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            margin-right: 10px;
+
+        }
+    </style>
+</head>
+<body>
+    <form action="/ask" method ="Post">
+
+    <h1>Rephrase Content</h1>
+
+        <h4>Add your content in the box below</h4>
+        <div class="form-group">
+        <label for="question">Content Snippet:</label>
+        <textarea id="question" name="question" required></textarea><br>
+        </div>
+
+        <div>
+            <div class="button-group">
+                <button type="submit" class="button" name="rephrase">Rephrase </button>
+                <button type="submit" class="button" name="convert">Generate more content</button>
+            </div>
+        </div>
+</form>
+
+</body>
+</html>

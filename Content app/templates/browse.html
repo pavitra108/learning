@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en" xmlns="http://www.w3.org/1999/html">
+<head>
+    <meta charset="UTF-8">
+    <title>Collect Data</title>
+    <style>
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            margin-bottom: 15px;
+        }
+        textarea {
+            width: 70%;
+            height: 150px; /* Adjust the height as needed */
+        }
+    </style>
+    <style>
+        .button-group {
+            display: flex;
+            justify-content: flex-start;
+
+        }
+        .button {
+            padding: 10px 10px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            margin-right: 10px;
+
+        }
+    </style>
+    <style>
+    ul {
+        padding-left: 20px; /* Adjust as needed */
+    }
+    li {
+        padding-right: 20px; /* Adjust as needed */
+    }
+
+</style>
+</head>
+<body>
+ <h1>Submit Data</h1>
+ </br></br>
+
+ <form action="/search" method="get">
+     <label for="keyword">Find you file:</label>
+     <input id="keyword" name="keyword" placeholder="filename"></br> </br>
+     <button type="submit" class="button" name="search">Search</button>
+     </br> </br>
+     <ul>
+        {% for file in files %}
+         <li><span style="margin-right: 100px;">{{ file }} </span><span><a href="/download?file={{ file }}">Download</a></span></li>
+        {% endfor %}
+    </ul>
+     </br></br>
+        </form>
+
+     <form action="/upload" method="post" enctype="multipart/form-data">
+
+       <label for="file">Please select a file. Only <b>.pdf,.docx,.txt, .jpg, .png </b>files are accepted.</label></br></br>
+        <input type="file" name="file_list" id="file" accept=".pdf,.docx,.txt, .jpg, .png" title="Browse" multiple>
+     </br>
+     </br>
+     <div class="button-group">
+                <button type="submit" class="button" name="browse">Upload </button>
+            </div>
+    </form>
+
+</body>
+</html>
