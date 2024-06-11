@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en" xmlns="http://www.w3.org/1999/html">
+<head>
+    <meta charset="UTF-8">
+    <title>Aadith Academy </title>
+</head>
+<body>
+<form action="/user" method ="post">
+<h1>Welcome to Aadith Academy</h1>
+    <h2>Learn at yor own pace.</h2>
+<h4> Fill in details to begin.</h4>
+    <label for="name">Name:</label>
+    <input type="text" id="name" name="name" required>
+
+    <br><br>
+     <label for="age">Age:</label>
+    <input type="number" id="age" name="age" required>
+
+    <br><br>
+    <label for="course_name">Course:</label>
+    <select id="course_name" name="course_name" required>
+        <option value="" disabled selected>Select course</option>
+        <option value="MA">Master in Arts</option>
+        <option value="BA">Bachelor in Arts</option>
+        <option value="ME">Masters in Engineering</option>
+        <option value="BE">Bachelors in Engineering</option>
+        <option value="MBA">Masters in Business Administration</option>
+    </select>
+
+    <br><br>
+    <label for="batch">Batch:</label>
+    <select id="batch" name="batch" required>
+        <option value="" disabled selected>Select batch</option>
+        <option value="1">Batch 1</option>
+        <option value="2">Batch 2</option>
+    </select>
+
+<p><input type="submit" value = "Submit" style = "color:blue; font-weight=bold;"></p>
+</form>
+<h4>Click <a href="/answers">here</a> to get revised content.</h4>
+<h4>Click <a href="/browse">here</a> to upload your files.</h4>
+</body>
+</html>
