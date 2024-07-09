@@ -3,9 +3,11 @@ import os
 import re
 import string
 import nltk
+import numpy as np
 from nltk.tokenize import word_tokenize
 from nltk.corpus import stopwords
 from sklearn.feature_extraction.text import TfidfVectorizer
+from sklearn.metrics.pairwise import cosine_similarity
 
 # Download the Punkt tokenizer models and list of stopwords.
 nltk.download('punkt')
@@ -63,10 +65,13 @@ def preprocess_and_tokenize_all_files(all_texts):
         tokenized_texts[filename] = tokens
     return tokenized_texts
 
-
 html_dir = "C:\\Users\\mvisw\\Documents\\workspace\\zoho help"
 all_texts = extract_texts_from_directory(html_dir)
 tokenized_texts = preprocess_and_tokenize_all_files(all_texts)
+if not all_texts:
+    print("No texts were extracted.")
+else:
+    print("Extracted texts from HTML files.")
 
 print(f"Processed and tokenized {len(tokenized_texts)} HTML documents.")
 for filename, tokens in tokenized_texts.items():
@@ -81,37 +86,55 @@ flattened_documents = [' '.join(tokens) for tokens in documents]
 vectorizer = TfidfVectorizer()
 
 # Fit and transform the documents
-X = vectorizer.fit_transform(flattened_documents)
+document_x = vectorizer.fit_transform(flattened_documents)
 
 # Get the feature names (words)
 feature_names = vectorizer.get_feature_names_out()
-
-# Print the matrix of token counts
-print("Matrix of token counts:")
-print(X.toarray())
 
 # Print the feature names
 print("Feature names (words):")
 print(feature_names)
 
 # Process and tokenize the user query
-user_ask = "what are page layouts in zoho crm and how to create"
-process_ask = preprocess_text(user_ask)
-print(process_ask)
-token_ask = tokenize_text(process_ask)
-print(token_ask)
-
-# Vectorize the tokenized output
-vectorizer_two = TfidfVectorizer()
+user_ask = ["page layouts in zoho crm and how to create"]
 
 # Fit and transform the query
-Y = vectorizer_two.fit_transform(token_ask)
-names = vectorizer_two.get_feature_names_out()
+user_y = vectorizer.transform(user_ask)
+names = vectorizer.get_feature_names_out()
 
 # Print the matrix of token counts
 print("Matrix of user query token counts:")
-print(Y.toarray())
+print(user_y.toarray())
 
 # Print the feature names
 print("User query feature names (words):")
 print(names)
+
+similarities = cosine_similarity(user_y, document_x)
+similarity_scores = similarities.flatten()
+non_zero_indices = np.nonzero(similarity_scores)[0]
+
+# Print similarity scores
+print("Similarity scores:")
+print(similarity_scores)
+
+# Get the indices of the top N most similar documents
+top_n = 4
+
+num_non_zero = len(non_zero_indices)
+top_n = min(top_n, num_non_zero)
+
+most_similar_indices = np.argsort(similarity_scores[non_zero_indices])[::-1][:top_n]
+most_similar_indices = non_zero_indices[most_similar_indices]
+
+# Debugging print statements
+print("non_zero_indices:", non_zero_indices)
+print("most_similar_indices:", most_similar_indices)
+print("Number of documents in all_texts:", len(all_texts))
+
+# Get the filenames of the most similar documents
+most_similar_files = [list(all_texts.keys())[i] for i in most_similar_indices]
+
+print("Most similar documents:")
+for filename in most_similar_files:
+    print(filename)
