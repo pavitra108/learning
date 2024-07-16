@@ -1,3 +1,5 @@
+import requests
+import json
 from bs4 import BeautifulSoup
 import os
 import re
@@ -8,6 +10,7 @@ from nltk.tokenize import word_tokenize
 from nltk.corpus import stopwords
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.metrics.pairwise import cosine_similarity
+
 
 # Download the Punkt tokenizer models and list of stopwords.
 nltk.download('punkt')
@@ -119,7 +122,7 @@ print("Similarity scores:")
 print(similarity_scores)
 
 # Get the indices of the top N most similar documents
-top_n = 4
+top_n = 3
 
 num_non_zero = len(non_zero_indices)
 top_n = min(top_n, num_non_zero)
@@ -138,3 +141,30 @@ most_similar_files = [list(all_texts.keys())[i] for i in most_similar_indices]
 print("Most similar documents:")
 for filename in most_similar_files:
     print(filename)
+file = most_similar_files[0]
+file_path = os.path.join(html_dir, file)
+file_text = extract_text_from_html(file_path)
+
+api_key = os.getenv('API_KEY')
+endpoint = "https://api.openai.com/v1/chat/completions"
+
+headers = {
+    'Authorization': f"Bearer {api_key}",
+    'Content-Type': 'application/json'
+}
+
+summary_content = json.dumps({
+    "model": "gpt-3.5-turbo",
+    "messages": [
+        {
+            "role": "system",
+            "content": f"Provide relevant important content for the query: {user_ask[0]}, based on the help doc content here: {file_text}"
+
+        }
+    ]
+})
+response1 = requests.request("POST", endpoint, headers=headers, data=summary_content)
+result1 = response1.json()
+generated_text1 = result1['choices'][0]['message']['content']
+print(generated_text1)
+    
