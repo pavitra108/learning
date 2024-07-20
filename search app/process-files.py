@@ -99,7 +99,7 @@ print("Feature names (words):")
 print(feature_names)
 
 # Process and tokenize the user query
-user_ask = ["page layouts in zoho crm and how to create"]
+user_ask = ["fields in crm"]
 
 # Fit and transform the query
 user_y = vectorizer.transform(user_ask)
@@ -141,9 +141,14 @@ most_similar_files = [list(all_texts.keys())[i] for i in most_similar_indices]
 print("Most similar documents:")
 for filename in most_similar_files:
     print(filename)
-file = most_similar_files[0]
-file_path = os.path.join(html_dir, file)
-file_text = extract_text_from_html(file_path)
+
+extracted_texts = []
+for file in most_similar_files[:3]:
+    file_path = os.path.join(html_dir, file)
+    file_text = extract_text_from_html(file_path)
+    extracted_texts.append(file_text)
+
+final_text = "\n\n".join(extracted_texts)
 
 api_key = os.getenv('API_KEY')
 endpoint = "https://api.openai.com/v1/chat/completions"
@@ -158,7 +163,7 @@ summary_content = json.dumps({
     "messages": [
         {
             "role": "system",
-            "content": f"Provide relevant important content for the query: {user_ask[0]}, based on the help doc content here: {file_text}"
+            "content": f"Provide relevant important content for the question: {user_ask[0]}, based on the help doc content here: {final_text}. Include as much details as possible."
 
         }
     ]
