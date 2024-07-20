@@ -102,7 +102,7 @@ print(feature_names)
 
 st.title("Content Search App")
 # Process and tokenize the user query
-user_ask = [st.text_input("Enter your query:")]
+user_ask = [st.text_input("Type in your question here")]
 if st.button("Search and Summarize"):
     if user_ask:
         # Fit and transform the query
@@ -173,8 +173,11 @@ if st.button("Search and Summarize"):
         generated_text1 = result1['choices'][0]['message']['content']
         print(generated_text1)
         # Display the results
-        st.write(f"Most relevant document: {most_similar_files}")
-        st.write("Summary:")
+        st.markdown("#### Most Relevant Documents:")
+        for file in most_similar_files:
+                st.markdown(f"- {file}")
+
+        st.write("#### Summary:")
         st.write(generated_text1)
     else:
         st.write("Please enter a query.")
