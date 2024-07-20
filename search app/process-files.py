@@ -10,6 +10,8 @@ from nltk.tokenize import word_tokenize
 from nltk.corpus import stopwords
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.metrics.pairwise import cosine_similarity
+import streamlit as st
+
 
 
 # Download the Punkt tokenizer models and list of stopwords.
@@ -98,78 +100,81 @@ feature_names = vectorizer.get_feature_names_out()
 print("Feature names (words):")
 print(feature_names)
 
+st.title("Content Search App")
 # Process and tokenize the user query
-user_ask = ["fields in crm"]
+user_ask = [st.text_input("Enter your query:")]
+if st.button("Search and Summarize"):
+    if user_ask:
+        # Fit and transform the query
+        user_y = vectorizer.transform(user_ask)
+        names = vectorizer.get_feature_names_out()
 
-# Fit and transform the query
-user_y = vectorizer.transform(user_ask)
-names = vectorizer.get_feature_names_out()
+        # Print the matrix of token counts
+        print("Matrix of user query token counts:")
+        print(user_y.toarray())
 
-# Print the matrix of token counts
-print("Matrix of user query token counts:")
-print(user_y.toarray())
+        # Print the feature names
+        print("User query feature names (words):")
+        print(names)
 
-# Print the feature names
-print("User query feature names (words):")
-print(names)
+        similarities = cosine_similarity(user_y, document_x)
+        similarity_scores = similarities.flatten()
+        non_zero_indices = np.nonzero(similarity_scores)[0]
 
-similarities = cosine_similarity(user_y, document_x)
-similarity_scores = similarities.flatten()
-non_zero_indices = np.nonzero(similarity_scores)[0]
+        # Get the indices of the top N most similar documents
+        top_n = 3
 
-# Print similarity scores
-print("Similarity scores:")
-print(similarity_scores)
+        num_non_zero = len(non_zero_indices)
+        top_n = min(top_n, num_non_zero)
 
-# Get the indices of the top N most similar documents
-top_n = 3
+        most_similar_indices = np.argsort(similarity_scores[non_zero_indices])[::-1][:top_n]
+        most_similar_indices = non_zero_indices[most_similar_indices]
 
-num_non_zero = len(non_zero_indices)
-top_n = min(top_n, num_non_zero)
+        # Debugging print statements
+        print("non_zero_indices:", non_zero_indices)
+        print("most_similar_indices:", most_similar_indices)
+        print("Number of documents in all_texts:", len(all_texts))
 
-most_similar_indices = np.argsort(similarity_scores[non_zero_indices])[::-1][:top_n]
-most_similar_indices = non_zero_indices[most_similar_indices]
+        # Get the filenames of the most similar documents
+        most_similar_files = [list(all_texts.keys())[i] for i in most_similar_indices]
 
-# Debugging print statements
-print("non_zero_indices:", non_zero_indices)
-print("most_similar_indices:", most_similar_indices)
-print("Number of documents in all_texts:", len(all_texts))
+        print("Most similar documents:")
+        for filename in most_similar_files:
+            print(filename)
 
-# Get the filenames of the most similar documents
-most_similar_files = [list(all_texts.keys())[i] for i in most_similar_indices]
+        extracted_texts = []
+        for file in most_similar_files[:3]:
+            file_path = os.path.join(html_dir, file)
+            file_text = extract_text_from_html(file_path)
+            extracted_texts.append(file_text)
 
-print("Most similar documents:")
-for filename in most_similar_files:
-    print(filename)
+        final_text = "\n\n".join(extracted_texts)
 
-extracted_texts = []
-for file in most_similar_files[:3]:
-    file_path = os.path.join(html_dir, file)
-    file_text = extract_text_from_html(file_path)
-    extracted_texts.append(file_text)
+        api_key = os.getenv('API_KEY')
+        endpoint = "https://api.openai.com/v1/chat/completions"
 
-final_text = "\n\n".join(extracted_texts)
-
-api_key = os.getenv('API_KEY')
-endpoint = "https://api.openai.com/v1/chat/completions"
-
-headers = {
-    'Authorization': f"Bearer {api_key}",
-    'Content-Type': 'application/json'
-}
-
-summary_content = json.dumps({
-    "model": "gpt-3.5-turbo",
-    "messages": [
-        {
-            "role": "system",
-            "content": f"Provide relevant important content for the question: {user_ask[0]}, based on the help doc content here: {final_text}. Include as much details as possible."
-
+        headers = {
+            'Authorization': f"Bearer {api_key}",
+            'Content-Type': 'application/json'
         }
-    ]
-})
-response1 = requests.request("POST", endpoint, headers=headers, data=summary_content)
-result1 = response1.json()
-generated_text1 = result1['choices'][0]['message']['content']
-print(generated_text1)
-    
+
+        summary_content = json.dumps({
+            "model": "gpt-3.5-turbo",
+            "messages": [
+                {
+                    "role": "system",
+                    "content": f"Provide relevant important content for the question: {user_ask[0]}, based on the help doc content here: {final_text}. Include as much details as possible."
+
+                }
+            ]
+        })
+        response1 = requests.request("POST", endpoint, headers=headers, data=summary_content)
+        result1 = response1.json()
+        generated_text1 = result1['choices'][0]['message']['content']
+        print(generated_text1)
+        # Display the results
+        st.write(f"Most relevant document: {most_similar_files}")
+        st.write("Summary:")
+        st.write(generated_text1)
+    else:
+        st.write("Please enter a query.")
