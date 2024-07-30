@@ -70,7 +70,7 @@ def preprocess_and_tokenize_all_files(all_texts):
         tokenized_texts[filename] = tokens
     return tokenized_texts
 
-html_dir = "C:\\Users\\mvisw\\Documents\\workspace\\zoho help"
+html_dir = "C:\\Users\\mvisw\\Documents\\workspace\\airline guide"
 all_texts = extract_texts_from_directory(html_dir)
 tokenized_texts = preprocess_and_tokenize_all_files(all_texts)
 if not all_texts:
@@ -96,6 +96,10 @@ document_x = vectorizer.fit_transform(flattened_documents)
 # Get the feature names (words)
 feature_names = vectorizer.get_feature_names_out()
 
+# Initialize session state conversation history
+if 'conversation_history' not in st.session_state:
+    st.session_state['conversation_history'] = ""
+
 # Print the feature names
 print("Feature names (words):")
 print(feature_names)
@@ -105,6 +109,7 @@ st.title("Content Search App")
 user_ask = [st.text_input("Type in your question here")]
 if st.button("Search and Summarize"):
     if user_ask:
+        st.session_state['conversation_history'] += f"User: {user_ask}\n"
         # Fit and transform the query
         user_y = vectorizer.transform(user_ask)
         names = vectorizer.get_feature_names_out()
@@ -149,35 +154,37 @@ if st.button("Search and Summarize"):
             extracted_texts.append(file_text)
 
         final_text = "\n\n".join(extracted_texts)
+        prompt = st.session_state['conversation_history'] + f"\n\nDocuments:\n{final_text}\n\nAI:"
 
-        api_key = os.getenv('API_KEY')
-        endpoint = "https://api.openai.com/v1/chat/completions"
 
-        headers = {
-            'Authorization': f"Bearer {api_key}",
-            'Content-Type': 'application/json'
-        }
+    api_key = os.getenv('API_KEY')
+    endpoint = "https://api.openai.com/v1/chat/completions"
 
-        summary_content = json.dumps({
-            "model": "gpt-3.5-turbo",
-            "messages": [
-                {
-                    "role": "system",
-                    "content": f"Provide relevant important content for the question: {user_ask[0]}, based on the help doc content here: {final_text}. Include as much details as possible."
+    headers = {
+        'Authorization': f"Bearer {api_key}",
+        'Content-Type': 'application/json'
+    }
 
-                }
-            ]
-        })
-        response1 = requests.request("POST", endpoint, headers=headers, data=summary_content)
-        result1 = response1.json()
-        generated_text1 = result1['choices'][0]['message']['content']
-        print(generated_text1)
-        # Display the results
-        st.markdown("#### Most Relevant Documents:")
-        for file in most_similar_files:
-                st.markdown(f"- {file}")
+    summary_content = json.dumps({
+        "model": "gpt-3.5-turbo",
+        "messages": [
+            {
+                "role": "system",
+                "content": f" Include as much details as possible. Provide all relevant important content for the question: {user_ask[0]}, using the help doc content and conversation history: {prompt}."
 
-        st.write("#### Summary:")
-        st.write(generated_text1)
-    else:
-        st.write("Please enter a query.")
+            }
+        ]
+    })
+    response1 = requests.request("POST", endpoint, headers=headers, data=summary_content)
+    result1 = response1.json()
+    generated_text1 = result1['choices'][0]['message']['content']
+    print(generated_text1)
+    # Display the results
+    st.markdown("#### Most Relevant Documents:")
+    for file in most_similar_files:
+            st.markdown(f"- {file}")
+
+    st.write("#### Summary:")
+    st.write(generated_text1)
+else:
+    st.write("Please enter a query.")
