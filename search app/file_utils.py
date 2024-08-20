@@ -103,9 +103,22 @@ def get_most_similar_docs_for_user_input(user_y, top_n=3):
     similarities = cosine_similarity(user_y, document_x)
     similarity_scores = similarities.flatten()
     non_zero_indices = np.nonzero(similarity_scores)[0]
-
+    print(similarity_scores)
+    # Convert similarity scores to percentages
+    similarity_percentages = similarity_scores * 100
     num_non_zero = len(non_zero_indices)
     top_n = min(top_n, num_non_zero)
+
+    # Create a list of tuples (document index, similarity percentage)
+
+    doc_similarity_list = [(idx, percent) for idx, percent in
+                           zip(non_zero_indices, similarity_percentages[non_zero_indices])]
+
+    # Sort the list by similarity percentage in descending order
+    doc_similarity_list = sorted(doc_similarity_list, key=lambda x: x[1], reverse=True)
+    top_docs = doc_similarity_list[:top_n]
+    for idx, percent in top_docs:
+        print(f"Document {idx} has a similarity score of {percent:.2f}%")
 
     most_similar_indices = np.argsort(similarity_scores[non_zero_indices])[::-1][:top_n]
     most_similar_indices = non_zero_indices[most_similar_indices]
@@ -116,7 +129,7 @@ def get_most_similar_docs_for_user_input(user_y, top_n=3):
     return most_similar_files
 
 
-def extraxt_top_n_file_content(most_similar_files: list, top_n=3):
+def extract_top_n_file_content(most_similar_files: list, top_n=3):
     extracted_texts = []
     for file in most_similar_files[:top_n]:
         file_path = os.path.join(HTML_DIR, file)

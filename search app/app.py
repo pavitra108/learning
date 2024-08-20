@@ -1,6 +1,6 @@
 import streamlit as st
 from model import query_chat_gpt, query_llama_3_1, query_distill_bert
-from file_utils import get_vectorized_output, get_most_similar_docs_for_user_input, extraxt_top_n_file_content
+from file_utils import get_vectorized_output, get_most_similar_docs_for_user_input, extract_top_n_file_content
 
 if 'conversation_history' not in st.session_state:
     st.session_state['conversation_history'] = ""
@@ -22,7 +22,6 @@ with st.form(key='search_form'):
 if submit_button:
     if user_ask:
 
-        st.session_state['conversation_history'] += f"User: {user_ask}\n"
         # Vectorize the user input
         user_y = get_vectorized_output(user_ask)
 
@@ -33,8 +32,9 @@ if submit_button:
             st.write("No relevant document found")
 
         else:
+            st.session_state['conversation_history'] += f"User: {user_ask}\n"
             st.session_state['form_disabled'] = True
-            extracted_texts = extraxt_top_n_file_content(most_similar_files)
+            extracted_texts = extract_top_n_file_content(most_similar_files)
             final_text = "\n\n".join(extracted_texts)
             prompt = st.session_state['conversation_history'] + f"\n\nDocuments:\n{final_text}\n\nAI:"
 
