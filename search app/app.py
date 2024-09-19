@@ -1,6 +1,7 @@
 import streamlit as st
 from model import query_chat_gpt, query_llama_3_1, query_distill_bert
-from file_utils import get_vectorized_output, get_most_similar_docs_for_user_input, extract_top_n_file_content
+from sentence_transformers import SentenceTransformer, util
+from file_utils import get_most_similar_docs_for_user_input, extract_top_n_file_content, document_embeddings
 
 if 'conversation_history' not in st.session_state:
     st.session_state['conversation_history'] = ""
@@ -9,24 +10,24 @@ if 'answers' not in st.session_state:
 if 'form_disabled' not in st.session_state:
     st.session_state['form_disabled'] = False
 
-st.title("SolTek AI Search")
+st.title("AirTek AI Search")
 model_choice = st.selectbox("Choose a Model", ("GPT-3.5", "LLaMA 3.1", "Bert"))
 form_disabled = st.session_state['form_disabled']
 
 with st.form(key='search_form'):
     user_ask = st.text_input("Type in your question here")
-    submit_button = st.form_submit_button(label='Ask SolTek')
+    submit_button = st.form_submit_button(label='Ask AirTek')
 
 # Process and tokenize the user query
-# user_ask = [st.text_input("Type in your question here")]
 if submit_button:
     if user_ask:
 
         # Vectorize the user input
-        user_y = get_vectorized_output(user_ask)
+        model = SentenceTransformer('paraphrase-MiniLM-L6-v2')
+        user_query = model.encode(user_ask, convert_to_tensor=True)
 
         # Get similar docs based on user input
-        most_similar_files = get_most_similar_docs_for_user_input(user_y)
+        most_similar_files = get_most_similar_docs_for_user_input(user_query, document_embeddings)
 
         if not most_similar_files:
             st.write("No relevant document found")
@@ -56,10 +57,10 @@ if submit_button:
             st.write(generated_text)
 
             if len(st.session_state['answers']) >= 2:
-                st.markdown("#### Previous Conversation History:")
-                for i, answer in enumerate(st.session_state['answers'][1:]):
-                    st.markdown(f"**Answer {i + 1}:** {answer}")
-                    st.markdown("---")
+                with st.expander("#### Previous Conversation History:", expanded=False):
+                    for i, answer in enumerate(st.session_state['answers'][1:]):
+                        st.markdown(f"**Answer {i + 1}:** {answer}")
+                        st.markdown("---")
 
             st.markdown("#### Most Relevant Documents:")
             for file in most_similar_files:
