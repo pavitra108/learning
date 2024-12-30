@@ -38,6 +38,7 @@ if submit_button:
             extracted_texts = extract_top_n_file_content(most_similar_files)
             final_text = "\n\n".join(extracted_texts)
             prompt = st.session_state['conversation_history'] + f"\n\nDocuments:\n{final_text}\n\nAI:"
+            print(prompt)
 
             # Depending on the model choice, query the respective model
             if model_choice == "GPT-3.5":

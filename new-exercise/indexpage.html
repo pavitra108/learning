@@ -1,0 +1,95 @@
+from flask import Flask, request, jsonify
+
+app = Flask(__name__)
+
+# Data storage (in-memory for simplicity)
+data = {
+    "name": None,
+    "city": None
+}
+
+# Simple HTML for collecting name and city
+html = """
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Simple Data Collection</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+        }
+        input {
+            margin: 5px;
+            padding: 5px;
+        }
+        button {
+            padding: 5px 10px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Collect Name and City</h1>
+
+    <form id="dataForm">
+        <label for="name">Name:</label>
+        <input type="text" id="name" placeholder="Enter your name" required><br>
+        <label for="city">City:</label>
+        <input type="text" id="city" placeholder="Enter your city" required><br>
+        <button type="button" onclick="submitData()">Submit</button>
+    </form>
+
+    <h3>Response:</h3>
+    <pre id="response"></pre>
+
+    <script>
+        async function submitData() {
+            const name = document.getElementById('name').value;
+            const city = document.getElementById('city').value;
+
+            if (!name || !city) {
+                document.getElementById('response').innerText = "Both name and city are required.";
+                return;
+            }
+
+            const response = await fetch('/collect_data', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ name, city })
+            });
+            const result = await response.json();
+            document.getElementById('response').innerText = JSON.stringify(result, null, 2);
+        }
+    </script>
+</body>
+</html>
+"""
+
+# Route to serve the simple HTML
+@app.route('/')
+def index():
+    return html
+
+# Endpoint to collect name and city
+@app.route('/collect_data', methods=['POST'])
+def collect_data():
+    try:
+        req_data = request.json
+        name = req_data.get('name')
+        city = req_data.get('city')
+
+        if not name or not city:
+            return jsonify({"error": "Both name and city are required"}), 400
+
+        data['name'] = name
+        data['city'] = city
+        return jsonify({"message": "Data collected successfully", "data": data}), 200
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
+if __name__ == '__main__':
+    app.run(debug=True)

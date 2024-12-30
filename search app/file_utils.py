@@ -1,9 +1,9 @@
 from bs4 import BeautifulSoup
 import os
-import re
 import string
 import nltk
 from sentence_transformers import SentenceTransformer, util
+import re
 
 
 # Download the Punkt tokenizer models and list of stopwords.
@@ -61,6 +61,27 @@ def encode_docs(html_dir: str):
     else:
         print("Extracted texts from HTML files.")
 
+def remove_repeated_content(text):
+    # Define regex patterns to match the repetitive content
+    patterns = [
+        r"Skip To Main Content",
+        r"Account\nSettings\nLogout",
+        r"Filter:\n.*?\nSubmit Search",
+        r"All Files"
+        r"You are here:.*?\n",
+        r"placeholder",
+
+    ]
+
+    # Iterate through patterns and remove each one from the text
+    for pattern in patterns:
+        text = re.sub(pattern, '', text, flags=re.DOTALL)
+
+    # Optionally, remove multiple blank lines that may be left behind
+    text = re.sub(r'\n\s*\n', '\n', text)  # Replace multiple newlines with a single newline
+
+    return text.strip()  # Return cleaned text without leading/trailing whitespace
+
     # Preprocess and get embeddings for each document
     document_embeddings = {}
     for filename, text in all_texts.items():
@@ -71,7 +92,7 @@ def encode_docs(html_dir: str):
     return document_embeddings, all_texts
 
 def get_most_similar_docs_for_user_input(user_query, document_embeddings, top_n=3):
-    user_embedding = model.encode(user_query, convert_to_tensor=True)
+    user_embedding = user_query
     print(f"User query embedding shape: {user_embedding.shape}")
     similarities = {}
     for filename, doc_embedding in document_embeddings.items():
@@ -95,7 +116,7 @@ def extract_top_n_file_content(most_similar_files: list, top_n=3):
     return extracted_texts
 
 
-HTML_DIR = "C:\\Users\\PavitraJothi\\Downloads\\APR User Guide"
+HTML_DIR = "C:\\Users\\mvisw\\Downloads\\help docs for testing"
 
 #Extract and encode the HTML documents
 document_embeddings, _ = encode_docs(HTML_DIR)

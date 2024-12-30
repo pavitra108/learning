@@ -19,7 +19,7 @@ def query_chat_gpt(user_ask: str, prompt: str) -> str:
         "messages": [
             {
                 "role": "system",
-                "content": f" Include as much details as possible. Provide all relevant important content for the question: {user_ask[0]}, using the help doc content and answer from conversation history, if relevant: {prompt}."
+                "content": f" Answer this question: {user_ask[0]}, only using the help doc content and answer from conversation history, if relevant: {prompt}."
 
             }
         ]
