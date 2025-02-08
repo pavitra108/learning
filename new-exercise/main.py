@@ -1,43 +1,25 @@
-from flask import Flask, request, jsonify
+from flask import Flask, render_template, request
 
 app = Flask(__name__)
 
-# Data storage (in-memory for simplicity)
-data = {
-    "name": None,
-    "city": None
-}
+# Route to display the form
+@app.route('/')
+def index():
+    return render_template('indexpage.html')  # This will render the HTML file
 
-# Endpoint to collect name
-@app.route('/collect_name', methods=['POST'])
-def collect_name():
-    try:
-        name = request.json.get('name')  # Get the name from the JSON request body
-        if not name:
-            return jsonify({"error": "Name is required"}), 400
+# Route to handle form submission
+@app.route('/collect_data', methods=['POST'])
+def collect_data():
+    # Get data from the form
+    name = request.form['name']
+    city = request.form['city']
 
-        data['name'] = name  # Save the name to the data store
-        return jsonify({"message": "Name collected successfully", "name": name}), 200
-    except Exception as e:
-        return jsonify({"error": str(e)}), 500
+    # Check if the data is provided
+    if not name or not city:
+        return "Both name and city are required."
 
-# Endpoint to collect city
-@app.route('/collect_city', methods=['POST'])
-def collect_city():
-    try:
-        city = request.json.get('city')  # Get the city from the JSON request body
-        if not city:
-            return jsonify({"error": "City is required"}), 400
+    # Process the data (you can add more logic here)
+    return f"Data received. Name: {name}, City: {city}"
 
-        data['city'] = city  # Save the city to the data store
-        return jsonify({"message": "City collected successfully", "city": city}), 200
-    except Exception as e:
-        return jsonify({"error": str(e)}), 500
-
-# Endpoint to retrieve all data
-@app.route('/get_data', methods=['GET'])
-def get_data():
-    return jsonify(data), 200
-
-if __name__ == '__main__':
-    app.run(debug=True)
+if __name__ == "__main__":
+    app.run(host='0.0.0.0', port=5000)
