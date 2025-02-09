@@ -43,7 +43,11 @@
         <br><br>
         <button type="submit">Convert</button>
     </form>
-
+    {% if converted_amount is not none %}
+        <h3>Converted Amount:</h3>
+        <p>{{ amount }} {{ from_currency }} is equal to <strong>{{ converted_amount }}</strong> {{ to_currency }}</p>
+    {% endif %}
+    <
 
     <!-- Currency Suggestions -->
     <datalist id="currency-list">
