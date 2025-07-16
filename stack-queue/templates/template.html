@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Two Forms with Process and Print</title>
+</head>
+<body>
+    <h2>Form 1: Enter Name</h2>
+    <form action="/get_name" method="POST">
+        <input type="text" name="name" placeholder="Enter your name" required>
+        <button type="submit" name="action" value="add_name">Add</button>
+    </form>
+     </br>
+    <h3>Process Name</h3>
+    <form action="/process_name" method="POST">
+        <button type="submit" name="process" value="process_name">Process a Name</button>
+    </form>
+    {% if message %}
+    <p style="color: green; font-weight: bold;">{{ message }}</p>
+    {% endif %}
+
+    <hr>
+
+    <h2>Form 2: Enter Order Number</h2>
+    <form action="/get_order" method="POST">
+        <input type="text" name="order_number" placeholder="Enter order number" required>
+        <button type="submit" name="action" value="place_order">Place Order</button>
+    </form>
+    </br>
+    <h3>Process Order</h3>
+    <form action="/process_order" method="POST">
+        <button type="submit" name="process" value="process_order">Process an Order</button>
+    </form>
+    {% if message %}
+    <p style="color: green; font-weight: bold;">{{ message }}</p>
+    {% endif %}
+</body>
+</html>
